@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smena kalendari</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05030c;--panel:#0d0a1c;--line:#241b45;--text:#efeaff;--dim:#6d6692;
+--m:#00f0ff;--e:#ff2bd6;--off:#0a0817}
+*{box-sizing:border-box;margin:0}
+html{background:var(--bg)}
+body{min-height:100vh;color:var(--text);font-family:'Chakra Petch',system-ui,sans-serif;
+padding:max(18px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));max-width:480px;margin:0 auto;
+background:
+ radial-gradient(420px 260px at 10% -5%,rgba(0,240,255,.16),transparent 70%),
+ radial-gradient(420px 300px at 100% 35%,rgba(255,43,214,.14),transparent 70%),
+ linear-gradient(rgba(120,90,255,.05) 1px,transparent 1px) 0 0/100% 28px,
+ linear-gradient(90deg,rgba(120,90,255,.05) 1px,transparent 1px) 0 0/28px 100%,var(--bg)}
+h1{font-size:30px;font-weight:700;letter-spacing:.04em;margin-bottom:14px;color:#fff;
+text-shadow:0 0 6px var(--m),0 0 18px var(--m),0 0 38px rgba(0,240,255,.6);animation:flick 6s infinite}
+@keyframes flick{0%,92%,100%{opacity:1}93%{opacity:.55}94%{opacity:1}96%{opacity:.7}97%{opacity:1}}
+.today{background:rgba(13,10,28,.8);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;
+backdrop-filter:blur(6px)}
+.today b{font-size:21px;display:block;margin-bottom:2px}
+.today small{color:var(--dim)}
+.today.m{border-color:var(--m);box-shadow:0 0 16px rgba(0,240,255,.35),inset 0 0 18px rgba(0,240,255,.12)}
+.today.m b{color:var(--m);text-shadow:0 0 10px var(--m)}
+.today.e{border-color:var(--e);box-shadow:0 0 16px rgba(255,43,214,.35),inset 0 0 18px rgba(255,43,214,.12)}
+.today.e b{color:var(--e);text-shadow:0 0 10px var(--e)}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nav button{background:transparent;color:var(--m);border:1px solid var(--m);width:46px;height:40px;border-radius:8px;
+font-size:20px;font-family:inherit;box-shadow:0 0 10px rgba(0,240,255,.3);transition:box-shadow .2s,transform .1s}
+.nav button:active{transform:scale(.94);box-shadow:0 0 20px var(--m)}
+.nav span{font-weight:600;font-size:18px;text-shadow:0 0 12px rgba(255,255,255,.4)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.wd{text-align:center;color:var(--dim);font-size:12px;padding:4px 0}
+.d{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;
+background:var(--off);color:#4a4470;border:1px solid #17122e}
+.d.m{color:var(--m);font-weight:700;background:rgba(0,240,255,.08);border-color:var(--m);
+text-shadow:0 0 8px var(--m);box-shadow:0 0 10px rgba(0,240,255,.45),inset 0 0 10px rgba(0,240,255,.15)}
+.d.e{color:var(--e);font-weight:700;background:rgba(255,43,214,.08);border-color:var(--e);
+text-shadow:0 0 8px var(--e);box-shadow:0 0 10px rgba(255,43,214,.45),inset 0 0 10px rgba(255,43,214,.15)}
+.d.t{color:#fff;animation:pulse 2s ease-in-out infinite}
+.d.t.o{border-color:#fff;box-shadow:0 0 14px rgba(255,255,255,.6)}
+.d.t.m{box-shadow:0 0 22px var(--m),inset 0 0 14px rgba(0,240,255,.4)}
+.d.t.e{box-shadow:0 0 22px var(--e),inset 0 0 14px rgba(255,43,214,.4)}
+@keyframes pulse{50%{transform:scale(1.09);filter:brightness(1.4)}}
+.d.x{visibility:hidden}
+.legend{display:flex;gap:16px;margin:14px 0;font-size:13px;color:var(--dim)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.set{background:rgba(13,10,28,.8);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.set label{display:block;font-size:13px;color:var(--dim);margin-bottom:8px}
+.row{display:flex;gap:8px}
+.set input{flex:1;min-width:0;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;
+padding:10px;font-family:inherit;font-size:15px;color-scheme:dark}
+.set button{background:var(--e);color:#fff;border:0;border-radius:8px;padding:0 18px;font-weight:700;font-family:inherit;
+font-size:15px;box-shadow:0 0 14px rgba(255,43,214,.6)}
+.hint{font-size:12px;color:var(--dim);margin-top:10px}
+button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){h1,.d.t{animation:none}}
+</style>
+</head>
+<body>
+<h1>SMENA // 2077</h1>
+<div class="today" id="today"></div>
+<div class="nav">
+  <button id="prev" aria-label="Oldingi oy">‹</button>
+  <span id="title"></span>
+  <button id="next" aria-label="Keyingi oy">›</button>
+</div>
+<div class="grid" id="grid"></div>
+<div class="legend">
+  <span><i style="background:var(--m)"></i>Ertalab</span>
+  <span><i style="background:var(--e)"></i>Kechqurun</span>
+  <span><i style="background:var(--off)"></i>Dam</span>
+</div>
+<div class="set">
+  <label for="start">Ertalabki smenaning birinchi kuni</label>
+  <div class="row"><input type="date" id="start"><button id="save">Saqlash</button></div>
+  <div class="hint">Shu kundan boshlab 2 kun ertalab, 2 dam, 2 kechqurun, 2 dam — takrorlanadi.</div>
+</div>
+
+<script type="module">
+/* ---- Saqlash qatlami: Firestore (localStorage zaxira sifatida) ---- */
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC_N2THHPDVPcuffL3gST-Z-c9h_4f81tk",
+  authDomain: "new-ideas-5fec8.firebaseapp.com",
+  projectId: "new-ideas-5fec8",
+  storageBucket: "new-ideas-5fec8.firebasestorage.app",
+  messagingSenderId: "600410330126",
+  appId: "1:600410330126:web:233a7747f65840b6da185f"
+};
+
+const KEY = 'smena_start';
+let ref = null;
+try { ref = doc(getFirestore(initializeApp(firebaseConfig)), 'smena', 'config'); } catch(e){ console.error(e); }
+
+async function loadStart(){
+  try{
+    if(ref){ const snap = await getDoc(ref);
+      if(snap.exists()){ const v = snap.data().start; try{localStorage.setItem(KEY,v);}catch(e){} return v; } }
+  }catch(e){ console.error(e); }
+  try{ return localStorage.getItem(KEY) || ''; }catch(e){ return ''; }
+}
+async function saveStart(v){
+  try{ localStorage.setItem(KEY, v); }catch(e){}
+  try{ if(ref) await setDoc(ref, {start: v}); }catch(e){ console.error(e); }
+}
+
+/* ---- Mantiq ---- */
+const MONTHS=['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+const WD=['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+const NAMES={m:'Ertalabki smena',e:'Kechki smena',o:'Dam kuni'};
+let start=null, view=new Date(); view.setDate(1);
+
+const utc=(y,m,d)=>Date.UTC(y,m,d);
+function phase(y,m,d){
+  if(!start) return 'o';
+  const diff=Math.round((utc(y,m,d)-start)/864e5);
+  const p=((diff%8)+8)%8;
+  return p<2?'m':p<4?'o':p<6?'e':'o';
+}
+function parse(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return utc(y,m-1,d); }
+
+function render(){
+  const y=view.getFullYear(), m=view.getMonth();
+  document.getElementById('title').textContent=MONTHS[m]+' '+y;
+  const g=document.getElementById('grid'); g.innerHTML='';
+  WD.forEach(w=>{const e=document.createElement('div');e.className='wd';e.textContent=w;g.appendChild(e);});
+  const lead=(new Date(y,m,1).getDay()+6)%7;
+  for(let i=0;i<lead;i++){const e=document.createElement('div');e.className='d x';g.appendChild(e);}
+  const n=new Date(y,m+1,0).getDate(), now=new Date();
+  for(let d=1;d<=n;d++){
+    const e=document.createElement('div');
+    e.className='d '+phase(y,m,d);
+    if(d===now.getDate()&&m===now.getMonth()&&y===now.getFullYear()) e.classList.add('t');
+    e.textContent=d; g.appendChild(e);
+  }
+  const t=document.getElementById('today'), ph=phase(now.getFullYear(),now.getMonth(),now.getDate());
+  t.className='today '+(start?ph:'');
+  if(!start){ t.innerHTML='<b>Boshlang\'ich sanani tanlang</b><small>Pastdan ertalabki smena birinchi kunini kiriting</small>'; return; }
+  const diff=Math.round((utc(now.getFullYear(),now.getMonth(),now.getDate())-start)/864e5);
+  let k=1; while(phase(now.getFullYear(),now.getMonth(),now.getDate()+k)===ph && k<3) k++;
+  const next=phase(now.getFullYear(),now.getMonth(),now.getDate()+k);
+  t.innerHTML='<b>Bugun: '+NAMES[ph]+'</b><small>Keyin: '+NAMES[next]+(k>1?' ('+k+' kundan so\'ng)':' (ertaga)')+'</small>';
+}
+
+document.getElementById('prev').onclick=()=>{view.setMonth(view.getMonth()-1);render();};
+document.getElementById('next').onclick=()=>{view.setMonth(view.getMonth()+1);render();};
+document.getElementById('save').onclick=async()=>{
+  const v=document.getElementById('start').value;
+  if(!v) return;
+  start=parse(v); await saveStart(v); render();
+};
+(async()=>{
+  const v=await loadStart();
+  if(v){ document.getElementById('start').value=v; start=parse(v); }
+  render();
+})();
+</script>
+</body>
+</html>
